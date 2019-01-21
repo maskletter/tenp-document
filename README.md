@@ -117,15 +117,15 @@ $ kvl dev
 #### 基础方式使用
 ```typescript
 
-import kvl from 'kvl';
-import { Main ,Router, config, ValidationDone } from 'kvl';
+import tenp from '@tenp/core';
+import { Main ,Router, config, ValidationDone } from '@tenp/core';
 @Router({}) 
 class HelloWord{
 
 	private msg: string = 'Hello, world'
 
 	@config({ url: '/hello', name: 'hello', type: 'get' })
-	private hello(req: Kvl.Request, res: Kvl.Response): void {
+	private hello(req: tenp.Request, res: tenp.Response): void {
 		res.end(`<h1>${this.msg}</h1>`)
 	}
 
