@@ -105,10 +105,10 @@
 
 通过Npm 方式安装kvl，并创建服务运行
 ```bash
-$ npm install kvl@latest -g
-$ kvl init hellworld
+$ npm install @tenp/cli -g
+$ tenp init hellworld
 $ cd hellworld
-$ kvl dev
+$ tenp dev
 ```
 <br>
 

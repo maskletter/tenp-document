@@ -4,7 +4,7 @@ module.exports = {
   home: true,
   title: 'Tenp Api',  // 设置网站标题
   description : '',
-  base : '/tenp-document/dist/',
+  base : '/dist/',
   head: [
     // ['link', { rel: 'icon', href: '/logo.png' }]
     ['link', { rel: 'shortcut icon', type: "image/x-icon", href: `/logo.ico` }],
