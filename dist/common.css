@@ -1,0 +1,23 @@
+
+/*.navbar,
+.navbar .links{ background: #5b5c60 !important;color: #fff !important }
+.search-box input{ background: #888 !important }
+.navbar .site-name{ color: #fff !important }*/
+.navbar{ box-shadow: 0px 0px 20px rgba(0,0,0,.1) }
+.sidebar>ul.sidebar-links>li>a{ font-weight: bold;font-size: 1.1em }
+
+::-webkit-scrollbar-track-piece { 
+background-color:#f8f8f8;
+}
+::-webkit-scrollbar {
+width:6px;
+height:9px;
+}
+::-webkit-scrollbar-thumb {
+background-color:#dddddd;
+background-clip:padding-box;
+min-height:28px;border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+background-color:#bbb;
+}
