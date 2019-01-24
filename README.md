@@ -26,10 +26,10 @@
  * [Typescript(开发语言)](http://www.typescriptlang.org/)
  * [pm2(服务)](https://github.com/Unitech/pm2)
  --- 
- * [router(路由功能)](/use.html#router路由)
- * [interceptor拦截器(用于进行请求拦截)](/tenp-plugin.html#interceptor-拦截器)
- * [Validation验证器(用于数据验证)](/tenp-plugin.html#validator-数据验证器)
- * [throw(全局接口异常)](/use.html#全局异常)
+ * [router(路由功能)](/dist/use.html#router路由)
+ * [interceptor拦截器(用于进行请求拦截)](/dist/tenp-plugin.html#interceptor-拦截器)
+ * [Validation验证器(用于数据验证)](/dist/tenp-plugin.html#validator-数据验证器)
+ * [throw(全局接口异常)](/dist/use.html#全局异常)
 
 
 
