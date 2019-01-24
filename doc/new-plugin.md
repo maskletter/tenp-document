@@ -19,19 +19,21 @@ module.exports =  class TextPlugin{
 		}
 	
     }
+    
 
     onInit(config){
        console.log('初始化插件')
     }
  
-    async onInitRequest(config = {}, classConfig){
+    async onInitRequest(config, classConfig){
         
     } 
 
-    async onInitClass({currentConfig, parentConfig}){
+    async onInitClass({$router, currentConfig, parentConfig}){
         return currentConfig;
     }
- 
+    
+
     async main(request, response, config){
         console.log(`url请求:${request.url}`)
     }
@@ -82,30 +84,31 @@ export declare namespace Plugin{
 
     /**
      * 初始化插件时候运行
-     * @param  {tenp初始化配置} config [description]
+     * @param  {[type]} config [tenp初始化配置]
      */
 	function onInit(config: tenp.InitConfig): void
 
     /**
-     * 初始化插件时候运行
-     * @param  {url配置} method [description]
-     * @param  {url所在class配置} method [description]
+     * [初始化url时候运行]
+     * @param {[type]} config:      tenp.RouterConfig [description]
+     * @param {[type]} classConfig: tenp.Router       [description]
      */
 	function InitRequest(config: tenp.RouterConfig, classConfig: tenp.Router): void
 
 	/**
 	 * 加载router时运行
-	 * @param  {当前路由对象} $router [description]
-	 * @param  {当前路由配置} currentConfig [description]
-	 * @param  {父级路由配置} parentConfig [description]
+     * @param  {[type]} options.$router       [class类实例]
+     * @param  {[type]} options.currentConfig [当前class的router配置]
+     * @param  {[type]} options.parentConfig  [父class的router配置]
 	 */
 	function InitClass(config: { $router: Function, currentConfig: tenp.Router, parentConfig: tenp.Router }): tenp.Router;
 	
+
     /**
-     * 插件主方法，运行于进入接口请求时候
-     * @param  {进入路由的request对象} request [description]
-     * @param  {进入路由的response对象} response [description]
-     * @param  {url配置} config [description]
+     * [插件主方法，运行于进入接口请求时候]
+     * @param  {[type]} request:          tenp.Request  [Request对象]
+     * @param  {[type]} response:         tenp.Response [Response对象]
+     * @param  {[type]} tenp.RouterConfig [url的@config配置]
      */
 	function main(request: tenp.Request, response: tenp.Response, config: tenp.RouterConfig): void;
 

@@ -63,7 +63,14 @@ $ npm install typescript @types/node @types/express --save
     * tsconfig.json  
     * package.json  
 
-> 自定义引用模块声明
+---
+
+> 接入express
+
+👉👉👉[接入express](/express.html)
+<br><br>
+
+> 自定义引用模块声明(types/test.d.ts)
 ```typescript
 declare module 'hello.arl'{
     const World: {

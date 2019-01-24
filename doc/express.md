@@ -46,7 +46,7 @@ Main({
 	baseUrl: '/express',
 	router: [ HelloWord ],
 	//设置express
-	express(app: Application){
+	express(app: express.Application){
 		app.use(compression())
 		app.use(session({
 			secret: 'secret',

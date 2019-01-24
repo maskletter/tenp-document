@@ -79,6 +79,25 @@ class HelloRouter{
 
 
 ```
+
+## 加载express插件
+
+
+
+```typescript
+import { Main ,Router, config } from '@tenp/core';
+import * as express from 'express';
+
+Main({
+	port: 8080,
+	express(app: express.Application){
+		//app为express实例化对象
+		app.use(function(req, res, next){
+			next();
+		})
+	}
+})
+```
 ## Response.router
 
 扩展的一个express方法(注意:Main({},express)方式没有此方法),用于进行接口跳转
