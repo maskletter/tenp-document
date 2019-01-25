@@ -164,6 +164,9 @@ private upload(req: tenp.Request, res: tenp.Response): void{
 
 用于验证接口接收得参数完整性及是否符合要求
 
+validator包含有，required(非空验证),type(类型验证),regular(正则验证),render(函数验证),可同时添加四种验证规则。<br>
+验证顺序为required -> type -> regular -> render
+
 ```typescript
 
 import tenp from '@tenp/core';
@@ -181,6 +184,21 @@ const articleValidation: tenp.Validation = {
                 msg: '发生了错误',
                 err
             })
+		},
+		//自定义正则验证
+		regular: /xx/g,
+		/**
+		 * 为参数设置一个默认值功能
+		 * 如果请求为post,默认值载入进req.body中，其他请求方式载入去req.query中
+		 */
+		default: "136xxxxxxxx",
+		/**
+		 * 自定义一个函数验证
+		 * 返回true表示验证通过,返回false表示验证不通过
+		 */
+		render(value: string, data: any){
+			if(value.length < 6) return false;
+			else return true;
 		}
 	},
 	/**
