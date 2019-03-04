@@ -18,17 +18,20 @@
 			<div class="content-block">
 				<div style="margin-bottom: 16px;">
 						<a href="https://badge.fury.io/js/%40tenp%2Fcore" title="NPM Version Badge" rel="nofollow">
-   <img src="https://badge.fury.io/js/%40tenp%2Fcore.svg" height="18">
-</a>
-<a href="https://img.shields.io/badge/node-%3E%3D6-brightgreen.svg" title="Node Limitation" rel="nofollow">
-   <img src="https://img.shields.io/badge/node-%3E%3D6-brightgreen.svg" height="18">
-</a>
-<a href="https://coveralls.io" title="Node Limitation" rel="nofollow">
-   <img src="https://coveralls.io/repos/github/maskletter/tenp/badge.svg?branch=master" height="18">
-</a>
-<a href="https://travis-ci.org" title="Node Limitation" rel="nofollow">
-   <img src="https://travis-ci.org/maskletter/tenp.svg?branch=master" height="18">
-</a>
+						   <img src="https://badge.fury.io/js/%40tenp%2Fcore.svg" height="18">
+						</a>
+						<a href="https://img.shields.io/badge/node-%3E%3D6-brightgreen.svg" title="Node Limitation" rel="nofollow">
+						   <img src="https://img.shields.io/badge/node-%3E%3D6-brightgreen.svg" height="18">
+						</a>
+						<a href="https://coveralls.io" title="Node Limitation" rel="nofollow">
+						   <img src="https://coveralls.io/repos/github/maskletter/tenp/badge.svg?branch=master" height="18">
+						</a>
+						<a href="https://travis-ci.org" title="Node Limitation" rel="nofollow">
+						   <img src="https://travis-ci.org/maskletter/tenp.svg?branch=master" height="18">
+						</a>
+						<a href="https://codeclimate.com/github/maskletter/tenp/maintainability">
+						   <img src="https://api.codeclimate.com/v1/badges/53669772f0a4dac97bd7/maintainability" />
+						</a>
 					</div>
 				<p style="text-align: left;color: #666;padding: 0 10px;">通过Npm 方式安装tenp</p>
 				<div class="language-bash line-numbers-mode"><pre class="language-bash"><code>$ <span class="token function">npm</span> <span class="token function">install</span> @tenp/cli -g

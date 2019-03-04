@@ -125,11 +125,11 @@ Main({
 
 ```
 
-## Injectable
+## provide/inject
 
 ```typescript
 
-class UserInjectable{
+class UserProvide{
 	private config: any;
     constructor(config: any){
         this.config = config;
@@ -142,14 +142,14 @@ class UserInjectable{
 class HelloWord{
 	
 	//用于获取注入器实例
-	@Injectable('text-injectable') private global: any;
+	@inject('text-provide') private global: any;
 
 }
 
 Main({
 	global: { name: 'tom' },
 	router: [ HelloWord ],
-	injectable: [ { class: UserInjectable, name: 'text-injectable', data: { name: 'tom' } } ]
+	provide: [ { class: UserProvide, name: 'text-provide', data: { name: 'tom' } } ]
 })
 
 ```

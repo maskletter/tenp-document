@@ -32,7 +32,7 @@ module.exports = {
           // ['/config', '环境配置']
         ]
       },
-      ['/config', '服务配置'],
+      ['/config', '服务配置', false],
       // { title: 'Guide', collapsable: false, url: '/config' },
       {
         title: '插件',

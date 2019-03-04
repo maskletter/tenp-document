@@ -1,63 +1,213 @@
 
+## Main
 
-## @Router
+Main是tenp的入口，它包含了tenp及express的全局配置等信息
 
-用于创建路由模块
+### 示例
+```typescript
+import { Main ,Router, config, data } from '@tenp/core';
+Main({
+	port: 6527
+	})
+```
+
+### 相关配置
+```typescript
+/**
+ * port: 服务端口号
+ * router: [路由模块]
+ * https: 配置https
+ * headers: 配置headers
+ * express: express配置
+ * validatorDone: 全局验证器错误处理
+ * throw: 全局异常处理
+ * getData: 全局post接收数据处理
+ * global: 全局参数
+ * static: 配置静态服务器
+ */
+Main({
+	port: 6527,
+	router: [],
+	headers: [],
+	express: function(){},
+	validatorDone: function(){},
+	throw: function(){}
+	getData: function(){},
+	https: {},
+	global: {},
+	static: 'assets'
+	})
+```
+
+### express
+`tenp`的底层是`express`，因此所有的`express`插件都可以直接运行，只需在Main中注册级可
+```typescript
+import { Main ,Router, config } from '@tenp/core';
+import * as express from 'express';
+
+Main({
+	port: 8080,
+	express(app: express.Application){
+		//app为express实例化对象
+		app.use(xxx);
+		app.use(function(req, res, next){
+			next();
+		})
+	}
+})
+
+```
+
+### https
+`tenp`默认启动的是http服务器，如果你需要同事启动https服务器，则需要添加https参数
+```typescript
+Main({
+	//如果初始化时候添加了https值，tenp就会自动创建一个https服务
+	https: {
+		//更多参数说明，请查阅https.createServer
+		cert: fs.readFileSync('./https/test.crt'),
+		key: fs.readFileSync('./https/test.key'),
+		port: 443
+	},
+})
+```
+### 全局参数
+`tenp`中内置了要给全局参数，你可以在任何路由模块中通过`@Global`获取这个参数，并得到藏匿其中的值
+```typescript
+@Router({})
+class HelloRouter{
+
+	/**
+	 * 通过添加@Global()方式，可以为class内任意参数设置为全局对象
+	 */
+	@Global() private global: any;
+
+	onInit(): void {
+		console.log(this.global.name)
+	}
+
+}
+Main({
+	router: [ HelloRouter ],
+	global: {
+		name: 'tom'
+	}
+})
+```
+### 静态服务器
+`tenp`的静态服务器是利用了`express`的内置中间件`express.static`创建的，更多详情可以参考`serve-static`库。
+```typescript
+import { Main } from '@tenp/core';
+Main({
+	port: 8080,
+	//如果配置static，tenp就会创建一个静态服务器，没有则不创建
+	static: path.join(process.cwd(), 'assets'),
+})
+```
+### 异常处理
+
+tenp内置了一个错误处理回调，方便使用者在接口当初通过throw抛出异常，来设定统一的错误处理来返给用户
 
 ```typescript
 import tenp from '@tenp/core';
-import { Main ,Router, config, data } from '@tenp/core';
+import { Main, Router, config } from '@tenp/core';
 
+@Router({})
+class HellWorld{
 
-@Router({
-	url: '/second'
-}) 
-class World{
+	@config({ type: 'get', url: '/hello-world' })
+	private test(req: tenp.Request, res: tenp.Response): void {
+		if(req.query.index == 123){
+			/**
+			 * 这里自定义了一个错误状态码
+			 * 或者 
+			 		throw '测试抛出异常';
+			 	此时status默认是500
+			 */
+			throw { status: 400, error: '测试抛出异常' };
+		}
+		res.json({ code: 1, msg: '返回成功' })
+	} 
 
-	@data private parentData: any;
-	
+}
+
+Main({
+	port: 8080,
 	/**
-	 * 路由的访问路径类会继承父类的url
-	 * ---> http://localhost:8080/base/first/second/world
+	 * 设置了全局错误处理，所有接口内throw出的错误都会经过此回调
 	 */
-	@config({ url: '/world', name: 'world', type: 'get' })
+	throw(request: tenp.Request, response: tenp.Response, status: number, error: Error){
+
+	    if(error.stack){
+            response.status(status).send(`<pre>${error.stack}</pre>`)
+        }else{
+            response.status(status).send(error)
+        }
+	}
+})
+
+
+```
+
+## @Router
+
+tenp的路由都是以模块为单位，将不同功能拆分成不同的路由模块，使对路由的管理更加清晰。
+
+### 最简单的路由模块
+```typescript
+import { Main ,Router, config, data } from '@tenp/core';
+@Router({})
+class HellWorldRouter{
 	private world(req: tenp.Request, res: tenp.Response): void {
 		res.end(`<h1>world</h1>`)
 	}
-
-	private onInit(): void {
-		console.log(this.parentData);
-		//输出{ name: 'Hello,world' }
-	}
-
 }
+```
 
+### 配置router
+```typescript
 /**
- * 给子路由传递参数,	
- * 子路由可以通过@data() private parentData: any;方式获取到父路由传递进来得参数
+ * name: 添加备注使用
+ * url: 配置路由模块内接口的根路径，url会继承父元素的路径
+ * provide: 配置注入器
+ * interceptor: 配置拦截器，可以为function或者数组function
+ * interceptorLevel: 拦截器级别
+ * router: 子路由
  */
 @Router({
-	url: '/first',
-	router: [ { class: HelloWorld, data: { name: 'Hello,world' } } ],
-})
-class HelloWord {
-	@config({ url: '/hello', name: 'hello', type: 'get' })
-	private hello(req: tenp.Request, res: tenp.Response): void {
-		res.end(`<h1>hello</h1>`)
-	}
-}
-
-
-Main({
-	baseUrl: '/base',
-	port: 8080,
-	router: [ HelloWord ],
+	name: '测试得模块',
+	url: '/user',
+	provide: [ { class: Class, name: string } ],
+	interceptor: [ function(){} ] | function(){},
+	interceptorLevel: 0,
+	router: [  ]
 })
 ```
+### 子路由参数传递
+当出现一个公共的路由模块，需要转载到多个不同路由时候，可能需要父路由来进行参数传递，来进行不同操作，可以在装载子路由时候为子路由配置不同参数，然后使用@data来获取父元素传进来的参数
+```typescript
+@Router({})
+class Test2Router{
+	@data private parentData: any;
+	private onInit(): void {
+		console.log(this.parentData)
+		//{ name: 'Hello,world' }
+	}
+}
+@Router({
+	/*router: [ Test2Router ]*/
+	router: [ { class: HelloWorld, data: { name: 'Hello,world' } } ],
+})
+class Test1Router{
+	
+}
+```
+
 ## @config
 
-通过@config来创建路由访问
+通过@config方法，你可以来创建一个接口请求，并为其添加各种方法来丰富它
 
+### 创建hello,world接口
 ```typescript
 import tenp from '@tenp/core';
 import { Main ,Router, config } from '@tenp/core';
@@ -70,37 +220,79 @@ class HelloRouter{
 		res.end('<h1>Hello,world</h1>')
 	}
 	
-	//只有通过@config声明得方法才会转为接口
-	private b(req: tenp.Request, res: tenp.Response): void{
+}
+```
+
+### 配置config
+```typescript
+/**
+ * name: 接口的备注信息
+ * url: 接口的url路径，会继承@Router及@Router父元素的url
+ * type: 接口的请求方式，也可以为数组形式['get','post']
+ * validation: 用于验证接收的参数的完整性
+ * validType: 固定验证的参数(默认在get只会验证query中的参数,而post时会验证body中的)
+ * interceptor: 配置拦截器，可以为function或者数组function
+ * interceptorLevel: 拦截器级别
+ * getData: 自定义post形式的参数解析
+ */
+@config({
+	name: '测试配置',
+	url: '/hello', 
+	type: 'get', 
+	validation: DeleteValidation,
+	validType: 'all',
+	interceptor: [ function(){} ] | function(){},
+	interceptorLevel: 0,
+	getData: function(){}
+	})
+```
+
+## @Get
+## @Post
+## @Head
+## @Delete
+## @Put
+
+同样用于创建接口,
+```typescript
+@Router({})
+class HelloRouter{
+
+	@Get('/test-get')
+	private hello(req: tenp.Request, res: tenp.Response): void {
+		res.end('<h1>Hello,world</h1>')
+	}
+	@Post('/test-post')
+	private hello(req: tenp.Request, res: tenp.Response): void {
+		res.end('<h1>Hello,world</h1>')
+	}
+	@Head('/test-head')
+	private hello(req: tenp.Request, res: tenp.Response): void {
+		res.end('<h1>Hello,world</h1>')
+	}
+	@Delete('/test-delete')
+	private hello(req: tenp.Request, res: tenp.Response): void {
+		res.end('<h1>Hello,world</h1>')
+	}
+	@Put('/test-put')
+	private hello(req: tenp.Request, res: tenp.Response): void {
+		res.end('<h1>Hello,world</h1>')
+	}
+	
+	//此方式创建不存在type属性，其他参数与@config一致
+	@Get({ url: '/test-get', ...argv })
+	private hello(req: tenp.Request, res: tenp.Response): void {
 		res.end('<h1>Hello,world</h1>')
 	}
 
 }
-
-
 ```
+## Response
+tenp的`Response`继承了express.Response的所有方法，并在express的基础上，添加了router等方法
 
-## 加载express插件
+### router
 
-
-
-```typescript
-import { Main ,Router, config } from '@tenp/core';
-import * as express from 'express';
-
-Main({
-	port: 8080,
-	express(app: express.Application){
-		//app为express实例化对象
-		app.use(function(req, res, next){
-			next();
-		})
-	}
-})
-```
-## Response.router
-
-扩展的一个express方法(注意:Main({},express)方式没有此方法),用于进行接口跳转
+response.router方法用于进行接口转发操作
 
 ```typescript
 
@@ -119,132 +311,61 @@ private hello(req: tenp.Request, res: tenp.Response): void {
 }
 
 ```
-## 全局异常
 
-tenp内置了一个错误处理回调，方便使用者在接口当初通过throw抛出异常，来设定统一的错误处理来返给用户
+### response.parentId
+父路由模块标识
+### response.id
+所在路由模块标识
 
+## controller
+
+### 创建控制器
+使用`createController`函数创建控制器，`createController`会返回一个主函数，即createController的第二个参数
 ```typescript
-import tenp from '@tenp/core';
-import { Main, Router, config } from '@tenp/core';
+import { createController } from '@tenp/core'
+
+export default createController('user.login', function(request: tenp.Request, response: tenp.Response){
+    response.end('hello,world')
+})
+
+```
+### 使用控制器
+```typescript
+import { Main, Router, config, Controller } from '@tenp/core';
 
 @Router({})
-class HellWorld{
+export default class HellWorld{
+ 	
+	/**
+	 * 使用控制器
+	 *  控制器的名字必须为唯一值
+	 */
+	@Controller('user.login')
+    @config({ url: '/login', type: 'get' })
+    private readonly login: void;
 
-	@config({ type: 'get', url: '/hello-world' })
-	private test(req: tenp.Request, res: tenp.Response): void {
-		if(req.query.index == 123){
-			/**
-			 * 这里自定义了一个错误状态码
-			 * 也可以使用快速模式, throw '测试抛出异常',此时status默认是500
-			 */
-			throw { status: 400, error: '测试抛出异常' };
-		}
-		res.json({ code: 1, msg: '返回成功' })
-	} 
+    /**
+     * 或者使用以下方式调用控制器
+     */
+    @config({ url: '/login', type: 'get' })
+    private login(request: tenp.Request, response: tenp.Response): void {
+    	controller('user.login').apply(this, [request, response]);
+    	//如果控制器无需使用this，也可以直接controller('user.login')()方式调用
+    };
 
 }
-
-Main({
-	port: 8080,
-	/**
-	 * 设置了全局错误处理，所有接口内throw出的错误都会经过此回调
-	 * @param  {[type]} request:  tenp.Request   [description]
-	 * @param  {[type]} response: tenp.Response  [description]
-	 * @param  {[type]} status:   number        [description]
-	 * @param  {[type]} error:    Error         [description]
-	 */
-	throw(request: tenp.Request, response: tenp.Response, status: number, error: Error){
-
-	    if(error.stack){
-            response.status(status).send(`<pre>${error.stack}</pre>`)
-        }else{
-            response.status(status).send(error)
-        }
-	}
-})
-
-
 ```
-## 状态管理
-
-tenp内创建了一个数据共享服务(global)
-
+在控制器内使用this对象
 ```typescript
-
-import tenp from '@tenp/core';
-import { Main ,Router, Global } from '@tenp/core';
-
-@Router({})
-class HelloRouter{
-
-	/**
-	 * 通过添加@Global()方式，可以为class内任意参数设置为全局对象
-	 */
-	@Global() private global: any;
-
-	onInit(): void {
-		console.log(this.global.name)
-	}
-
-}
-
-//你可以在初始化tenp时候为global复制
-Main({
-	router: [],
-	global: {
-		name: 'tom'
-	}
-})
-
-
-```
-
-## 静态服务器
-
- `tenp` 的静态服务器是利用了`express`的内置中间件`express.static`创建的，更多详情可以参考`serve-static`库。
-
-```typescript
-//tenp配置静态服务器很简单，只需要设置一个static参数级可
-import tenp from '@tenp/core';
-import { Main } from '@tenp/core';
-Main({
-	port: 8080,
-	static: path.join(process.cwd(), 'assets'),
-})
-
-```
-
-
-## 设置header
-
-```typescript
-Main({
-	headers: {
-		'Access-Control-Allow-Origin': '*',
-		'Access-Control-Allow-Headers': 'Content-Type,Content-Length, aa, Authorization, Accept,X-Requested-With, authkeys',
-	}
+//创建控制器
+export default createController('user.login', function(this: HellWorld, request: tenp.Request, response: tenp.Response){
+    response.end('hello,world')
 })
 ```
 
-## https访问
-
-配置htttps访问,如果添加了https对象，`tenp`会自动创建https服务器
-
-```typescript
-Main({
-	//如果初始化时候添加了https值，tenp就会自动创建一个https服务
-	https: {
-		//更多参数说明，请查阅https.createServer
-		cert: fs.readFileSync('./https/test.crt'),
-		key: fs.readFileSync('./https/test.key'),
-		port: 443
-	},
-})
-```
-
-## require内的路径问题
-
+## node require路径引用
 nodejs的require并不能设置引用的根路径，这就导致了ts内编写时候的路径寻找不到包文件
+
 ```typescript
 /**
  * 例如tsconfig.json里配置的baseUrl为【src】

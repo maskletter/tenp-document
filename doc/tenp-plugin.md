@@ -26,8 +26,8 @@ tenp目前主要内置了validator(数据验证器),receive(数据接收器),int
 			<td align="center">验证数据完整性</td>
 		</tr>
 		<tr>
-			<td align="center">Injectable</td>
-			<td align="center">注入器,路由间数据共享</td>
+			<td align="center">provide/inject</td>
+			<td align="center">注入器,服务工厂</td>
 		</tr>
 	</tbody>
 
@@ -164,8 +164,8 @@ private upload(req: tenp.Request, res: tenp.Response): void{
 
 用于验证接口接收得参数完整性及是否符合要求
 
-validator包含有，required(非空验证),type(类型验证),regular(正则验证),render(函数验证),可同时添加四种验证规则。<br>
-验证顺序为required -> type -> regular -> render
+validator包含有，required(非空验证),type(类型验证),regular(正则验证),valid(函数验证),可同时添加四种验证规则。<br>
+验证顺序为required -> type -> regular -> valid
 
 ```typescript
 
@@ -196,7 +196,7 @@ const articleValidation: tenp.Validation = {
 		 * 自定义一个函数验证
 		 * 返回true表示验证通过,返回false表示验证不通过
 		 */
-		render(value: string, data: any){
+		valid(value: string, data: any){
 			if(value.length < 6) return false;
 			else return true;
 		}
@@ -252,9 +252,9 @@ interface tenp.config {
 ```typescript
 
 import tenp from '@tenp/core';
-import { Main ,Router, config } from '@tenp/core';
+import { Main ,Router, config, inject } from '@tenp/core';
 
-class UserInjectable{
+class UserProvide{
 	private config: any;
     constructor(config: any){
         this.config = config;
@@ -266,11 +266,11 @@ class UserInjectable{
 @Router({})
 class hello extends tenp {
 	
-	@Injectable('text-injectable') private textInjectable: any;
+	@inject('text-provide') private textprovide: any;
 	
 	onInit(){
-		//这里的this.textInjectable为UserInjectable实例化对象
-		console.log(this.textInjectable)
+		//这里的this.textprovide为UserProvide
+		console.log(this.textprovide)
 	}
 
 }
@@ -278,10 +278,10 @@ class hello extends tenp {
 
 Main({
 	router: [ hello ],
-	injectable: [ { class: UserInjectable, name: 'text-injectable', data: { name: 'tom' } } ]
+	provide: [ { class: UserProvide, name: 'text-provide', data: { name: 'tom' } } ]
 })
 
 //Function为注入得class对象,name为名字,data为class初始化时传进来的值
-const injectable = [ { class: Function, name: 'xx', data: {} } ]
+const provide = [ { class: Function, name: 'xx', data: {} } ]
 
 ```

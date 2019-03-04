@@ -30,7 +30,7 @@ interface InitConfig{
 
 	getData?:(request: tenp.Response) => void
 
-	throw?:(request: ExpressRequest, response: ExpressResponse, status: number, error: Error) => void;
+	throw?:(request: tenp.Request, response: tenp.Response, status: number, error: Error) => void;
 
 }
 ```
@@ -76,7 +76,19 @@ interface RouterConfig{
 	validation?: Validation
 
 	validType?: 'query' | 'body' | 'param' | 'all'
+
+	controller?: string
 }
+```
+## tenp.createController 
+
+<br>
+
+```typescript
+interface controllerInterface{
+	(request: tenp.Request, response: tenp.Response): void
+}
+export const createController:(name: string, callback: tenp.controllerInterface) => Function;
 ```
 ## tenp.ValidationError 
 
@@ -84,12 +96,12 @@ interface RouterConfig{
 
 ```typescript
 interface ValidationError {
-	errorMsg: string,
-	required: boolean,
 	name: string,
-	regular: string,
-	value: string
-	type: 'string' | 'number' | 'boolean' | any
+	msg: string,
+	value: string,
+	type: string,
+	step: string,
+	alias: string
 }
 ```
 ## tenp.RouterTree
@@ -142,14 +154,15 @@ interface Validation {
 
 	[argy: string]: {
 		type?: 'string' | 'number' | 'boolean' | any,
+		msg?: { regular?: string, type?: string, required?: string, valid?: string },
 		required?: boolean | false,
 		name?: string,
 		regular?: RegExp,
 		description?: string,
-		default?: string
-		render?: (value: string, data: any) => boolean
+		default?: string 
+		valid?: (value: string, data: any) => boolean
 		done?: ValidationDone
-	} | Function | 'string' | 'number' | 'boolean' | boolean | { empty: string, regular: string } | any;
+	} | Function | 'string' | 'number' | 'boolean' | boolean;
 
 }
 ```
@@ -174,12 +187,12 @@ interface Interceptor{
 }
 ```
 
-## tenp.Injectable 
+## tenp.inject 
 
 <br>
 
 ```typescript
-function Injectable(name: string): any
+function inject(name: string): any
 ```
 ## tenp.Global 
 
